@@ -1,4 +1,2 @@
-apache2dot
-==========
-
-get a vhost configuration and represent it in a dot file
+Graphviz archive ...
+thanks to : https://github.com/mgriffin/graphviz_network for the nice sample that i stole ;)

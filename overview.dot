@@ -1,0 +1,95 @@
+graph switches {
+  // colours for the lines relate to the line speed
+  // #00bbff is for gigabit
+  // #ffbb00 is for 100Mbit
+  // #bbff00 is for 10 Mbit
+  
+  label="Infrastructure Overview";
+  fontname="arial";
+  
+  node [
+    shape=box, 
+    fontname="arial",
+    fontsize=8,
+    style=filled,
+    color="#d3edea"
+  ];
+  splines="compound"
+  
+//  sw1 [ label="192.168.1.101" shape=none image="images/gigabitSwitch.png" labelloc=b color="#ffffff"];
+//  sw2 [ label="192.168.1.100" shape=none image="images/gigabitSwitch.png" labelloc=b color="#ffffff"];
+//  sw3 [ label="192.168.1.252" shape=none image="images/gigabitSwitch.png" labelloc=b color="#ffffff"];
+//  sw4 [ label="192.168.1.251" shape=none image="images/gigabitSwitch.png" labelloc=b color="#ffffff"];
+//  
+//
+//  router [ label= "192.168.1.250", 
+//           shape=none ,
+//           image="images/router.png" ,
+//           labelloc=b ,
+//           color="#ffffff" ];
+//
+  users_browser  [ label="Users" shape=none image="images/laptop.png" labelloc=b color="#ffffff" ];
+  dns [ label="Internet DNS" shape=none image="images/dns.png" labelloc=b color="#ffffff" ];
+  bxl_lb [ label="Actif/passif Software loadbalancer (L4)" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+  bxl_apache1 [ label="Apache ReverseProxy (LB L7)" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+  bxl_apache2 [ label="Apache ReverseProxy (LB L7)" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+  
+  bxl_tomcat1 [ label="Tomcat server" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+  bxl_tomcat2 [ label="Tomcat server" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+
+  sec_lb [ label="Actif/passif Software loadbalancer (L4)" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+  sec_apache1 [ label="Apache ReverseProxy (LB L7)" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+  sec_apache2 [ label="Apache ReverseProxy (LB L7)" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+  
+  sec_tomcat1 [ label="Tomcat server" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+  sec_tomcat2 [ label="Tomcat server" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+
+ 
+
+  cloud [ label="The Internet" shape=none, image="images/cloud.png" labelloc=b color="#ffffff"]
+  users_browser -- cloud; 
+  users_browser -- dns;
+  cloud -- bxl_lb;
+  cloud -- sec_lb;
+
+
+  subgraph cluster_0 {
+		style=filled;
+		color=lightgrey;
+		node [style=filled,color=white];
+		bxl_lb -- bxl_apache1 ;
+		bxl_lb -- bxl_apache2 ;
+ //ACTIVE ROUTE 
+  		bxl_apache1 -- bxl_tomcat1 ;
+  		bxl_apache2 -- bxl_tomcat1 ;
+  		bxl_apache1 -- bxl_tomcat2 ;
+  		bxl_apache2 -- bxl_tomcat2 ;
+		label = "Brussels";
+	}
+
+  subgraph cluster_1 {
+		node [style=filled];
+		sec_lb -- sec_apache1 ;
+		sec_lb -- sec_apache2 ;
+//PASSIVE ROUTE		
+		sec_apache1 -- sec_tomcat1 [color="#bbff00"];
+  		sec_apache2 -- sec_tomcat1 [color="#bbff00"];
+  		sec_apache1 -- sec_tomcat2 [color="#bbff00"];
+  		sec_apache2 -- sec_tomcat2 [color="#bbff00"];
+		label = "Seclin";
+		color=blue
+	}
+//ACIVE ROUTE 
+  		sec_apache1 -- bxl_tomcat1 ;
+  		sec_apache2 -- bxl_tomcat1 ;
+  		sec_apache1 -- bxl_tomcat2 ;
+  		sec_apache2 -- bxl_tomcat2 ;
+
+//PASSIVE ROUTE FROM BXL
+  		bxl_apache1 -- sec_tomcat1 [color="#bbff00"];
+  		bxl_apache2 -- sec_tomcat1 [color="#bbff00"];
+  		bxl_apache1 -- sec_tomcat2 [color="#bbff00"];
+  		bxl_apache2 -- sec_tomcat2 [color="#bbff00"];
+
+}
+
