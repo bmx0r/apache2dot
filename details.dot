@@ -1,0 +1,61 @@
+digraph switches {
+  // colours for the lines relate to the line speed
+  // #00bbff is for gigabit
+  // #ffbb00 is for 100Mbit
+  // #bbff00 is for 10 Mbit
+  
+  label="Infrastructure Stickyness details";
+  fontname="arial";
+  
+  node [
+    shape=box, 
+    fontname="arial",
+    fontsize=8,
+    style=filled,
+    color="#d3edea"
+  ];
+  splines="compound"
+  
+  users_browser  [ label="Users" shape=none image="images/laptop.png" labelloc=b color="#ffffff" ];
+  dns [ label="Internet DNS" shape=none image="images/dns.png" labelloc=b color="#ffffff" ];
+  bxl_lb [ label="Actif/passif Software loadbalancer (L4)" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+subgraph cluster_3{ 
+  bxl_apache1 [ label="Apache | { mod_header | mod_proxy_https |mod_proxy_ajp }" shape=record labelloc=r ];
+  bxl_apache2 [ label="Apache | { mod_header | mod_proxy_https |mod_proxy_ajp }" shape=record labelloc=r ];
+  label = "Stickyness via session cookie";
+  }
+  bxl_tomcat1 [ label="Tomcat server" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+  bxl_tomcat2 [ label="Tomcat server" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+
+//  sec_lb [ label="Actif/passif Software loadbalancer (L4)" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+//  sec_apache1 [ label="Apache ReverseProxy (LB L7)" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+//  sec_apache2 [ label="Apache ReverseProxy (LB L7)" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+//  
+//  sec_tomcat1 [ label="Tomcat server" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+//  sec_tomcat2 [ label="Tomcat server" shape=none image="images/servers.png" labelloc=b color="#ffffff" ];
+
+ 
+
+  cloud [ label="The Internet" shape=none, image="images/cloud.png" labelloc=b color="#ffffff"]
+  users_browser -> cloud; 
+  users_browser -> dns;
+  cloud -> bxl_lb;
+//  cloud -- sec_lb;
+  subgraph cluster_0 {
+		style=filled;
+		color=lightgrey;
+		node [style=filled,color=white];
+		bxl_lb -> bxl_apache1 ;
+		bxl_lb -> bxl_apache2 ;
+		label = "Stickyness based on ip source (30sec)";
+	}
+  subgraph cluster_1{
+ //ACTIVE ROUTE 
+  		bxl_apache1 -> bxl_tomcat1 ;
+  		bxl_apache2 -> bxl_tomcat1 ;
+  		bxl_apache1 -> bxl_tomcat2 ;
+  		bxl_apache2 -> bxl_tomcat2 ;
+		label = "Tomcats";
+	}
+}
+
